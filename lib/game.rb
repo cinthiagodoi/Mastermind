@@ -1,48 +1,60 @@
 require "./lib/hit.rb"
-require "./lib/guess.rb"
+require "./lib/user_play.rb"
+require "./lib/cpu_play.rb"
 
 class Game
   attr_reader :secret_selector
+  attr_reader :guess
   
   
   def initialize
     @attempts = 0
-    @cpu_game =  ''
-    choose_secret_selector 
+    @select_player = ''
+    @last_hit = []
+    @guess = []
+    who_plays
+   
   end
 
-  def choose_secret_selector
+  def who_plays
     print "Would you like to choose the secret? (Y/N): "
-    @cpu_game = gets.chomp.downcase.strip == 'y'
-    @secret = Secret.new(@cpu_game)
-    @secret.execute_selection
+    
+    @select_player = gets.chomp.downcase.strip == 'y'
+    @secret = Secret.new(@select_player)
+    @secret_colors = @secret.execute_selection
   
     run 
   end
 
-
   def run
-    computer_guess = []
-    wrong_position = ''
+    
     while @attempts <= 12
-      @guess = Guess.new(@secret, @cpu_game, computer_guess, wrong_position)
-      computer_guess = @guess.execute
-      wrong_position = @guess.wrong_position
+      if @select_player
+        @cpu_play = CpuPlay.new(@secret, @guess, @last_hit)
+        @guess = @cpu_play.cpu_guess
+      else
+        @user_play = UserPlay.new(@secret)
+        @guess = @user_play.user_guess
+      end
+      @hit = Hit.new(@secret, @guess)
+      @last_hit = @hit.compare_chooses
       check_guess
-      @attempts += 1
+      @attempts +=1 
     end
   end
+
 
   def check_guess
-    hit = Hit.new(@secret, @guess)
-    print "Your hit: #{hit.compare_chooses}"
-    if @secret.secret_colors == @guess.attempt_guess
-      print "You discovered the secret"
+    print "\nYour hit: #{@last_hit}\n"
+    if @secret_colors == @guess
+      print "\nYou win!\n"
       @attempts = 13
     elsif @attempts == 12
-      print "You lose!"
+      print "\nYou lose!\n"
     end
   end
+
+  
 
 end
 

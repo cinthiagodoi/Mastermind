@@ -1,20 +1,21 @@
-require "./lib/game.rb"
-require "./lib/secret.rb"
-require "./lib/guess.rb"
-
 class Hit
   
   def initialize(secret, guess)
     @color_secret = secret.secret_colors
-    @choose_secret = guess.attempt_guess
+    @guess = guess
+    
   end
 
   def compare_chooses
-    @removed_equals = @choose_secret.zip(@color_secret).map {|a, b| a if a != b }
-    @removed_equals.map! do |v| 
-      next 'x' if @color_secret.include?(v)
-      next 'o' if v == nil
-      nil 
+    @guess.map.with_index do |value, index|
+      
+      if value == @color_secret[index]
+        "o"
+      elsif @color_secret.include?(value) && @color_secret.select{|v| v == value}.size >= @guess.select{|v| v == value}.size 
+        "x"
+      else
+        nil
+      end
     end
   end
 
