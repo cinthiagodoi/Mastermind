@@ -1,6 +1,6 @@
 # Mastermind
 
-Aa mastermind game, building in Ruby.
+A mastermind game, building in Ruby.
 
 ### Prerequisites
 
